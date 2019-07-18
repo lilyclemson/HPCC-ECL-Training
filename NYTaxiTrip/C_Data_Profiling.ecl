@@ -1,3 +1,4 @@
+IMPORT STD;
 IMPORT DataPatterns;
 IMPORT NYTaxiTrip.A_Data_Ingestion;
 

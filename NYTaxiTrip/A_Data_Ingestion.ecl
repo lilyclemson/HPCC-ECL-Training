@@ -4,11 +4,11 @@ IMPORT STD;
 EXPORT A_Data_Ingestion := MODULE
 
 EXPORT Layout := RECORD
-  STD.Date.Date_t date;
-  REAL8 precipintensity;
-  INTEGER trip_counts;
+  STRING date;
+  STRING precipintensity;
+  STRING trip_counts;
 END;
 
-EXPORT raw := DATASET('~thor::taxi::traindata', Layout, THOR);
+EXPORT raw := DATASET('~NY_SampleInput.csv', Layout, CSV(HEADING(1)));
 
 END;

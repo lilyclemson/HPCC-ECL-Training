@@ -4,5 +4,5 @@ IMPORT NYTaxiTrip.A_Data_Ingestion;
 raw := A_Data_Ingestion.raw;
 
 //Data Validation
-validSet := raw( date < 20000101 AND date > 20190501 );
+validSet := raw( (INTEGER) date < 20000101 AND (INTEGER) date > 20190501 );
 OUTPUT(validSet);

@@ -7,18 +7,33 @@ EXPORT D_Data_Enhancement := MODULE
 SHARED raw := A_Data_Ingestion.raw;
 
 //Enhance raw data
-EXPORT enhancedLayout := RECORD
-  INTEGER id;
-  INTEGER month_of_year;
-  INTEGER day_of_week;
-  REAL8   precipintensity;
-  INTEGER trip_counts;
+
+//Enhancement 1
+EXPORT enhancedLayout1 := RECORD
+  UNSIGNED4 date;
+  REAL8 precipintensity;
+  UNSIGNED3 trip_counts;
 END;
 
-EXPORT enhancedData := PROJECT(raw, TRANSFORM(enhancedLayout,
+EXPORT enhancedData1 := PROJECT(raw, TRANSFORM(enhancedLayout1,
+                                                SELF.date := (INTEGER) LEFT.date,
+                                                SELF.precipintensity := (REAL) LEFT.precipintensity,
+                                                SELF.trip_counts := (INTEGER) LEFT.trip_counts));
+//Enhancement 2
+EXPORT enhancedLayout2 := RECORD
+  UNSIGNED2 id;
+  UNSIGNED2 month_of_year;
+  UNSIGNED2 day_of_week;
+  REAL8   precipintensity;
+  UNSIGNED3 trip_counts;
+END;
+
+EXPORT enhancedData2 := PROJECT(enhancedData1, TRANSFORM(enhancedLayout2,
                                         SELF.id := COUNTER,
                                         SELF.day_of_week := (INTEGER) Std.Date.DayOfWeek(LEFT.date),
-                                        SELF.month_of_year := (INTEGER) LEFT.date[5..6],
+                                        SELF.month_of_year := (INTEGER) Std.Date.Month(LEFT.date),
                                         SELF.precipintensity := LEFT.precipintensity,
                                         SELF.trip_counts := LEFT.trip_counts));
+
+EXPORT enhancedData := enhancedData2;
 END;
