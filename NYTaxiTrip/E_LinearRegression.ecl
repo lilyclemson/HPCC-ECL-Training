@@ -5,19 +5,21 @@ IMPORT LinearRegression AS LROLS;
 
 //Reading enhanced data
 enhancedData := D_Data_Enhancement.enhancedData;
+OUTPUT(enhancedData, NAMED('enhancedData'));
 
 //Transform to Machine Learning Dataframe, such as NumericField
-ML_Core.ToField(enhancedData, train);
-OUTPUT(train);
+ML_Core.ToField(enhancedData, trainset);
+OUTPUT(trainset, NAMED('trainset'));
 
 // split into input (X) and output (Y) variables
-X := train(number < 4);
-Y := train(number = 4);
-
+X := trainset(number < 4);
+Y := trainset(number = 4);
+OUTPUT(X, NAMED('X'));
+OUTPUT(Y, NAMED('Y'));
 
 //Training LinearRegression Model
 lr := LROLS.OLS(X, Y);
 
 //Prediction
 predict := lr.predict(X);
-OUTPUT(predict);
+OUTPUT(predict, NAMED('predict'));

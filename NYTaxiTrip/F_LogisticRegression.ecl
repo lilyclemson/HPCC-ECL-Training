@@ -6,10 +6,8 @@ IMPORT LogisticRegression AS LR;
 //Reading enhanced data
 enhancedData := D_Data_Enhancement.enhancedData;
 
-
 //Average trips per day
 avgTrip := AVE(enhancedData, trip_counts);
-
 //Add trend layout
 trainLayout := RECORD
   INTEGER id;
@@ -18,21 +16,25 @@ trainLayout := RECORD
   REAL8   precipintensity;
   INTEGER trend;
 END;
-
+//Add class label
 trainData := PROJECT(enhancedData, TRANSFORM(trainLayout,
                                             SELF.trend := IF(LEFT.trip_counts < avgTrip, 0, 1),
                                             SELF := LEFT));
+OUTPUT(trainData, NAMED('trainData'));
 
-//Transform to Machine Learning Dataframe, such as NumericField
-ML_Core.ToField(trainData, NFtrain);
+//Transform to Machine Learning Dataframe, such as DiscreteField
+ML_Core.ToField(trainData, trainset);
+OUTPUT(trainset, NAMED('trainset'));
 
-//Independent and Dependent data
-DStrainInd := NFtrain(number < 4);
-DStrainDpt := PROJECT(NFtrain(number = 4), TRANSFORM(Types.DiscreteField, SELF.number := 1, SELF := LEFT));
+// split into input (X) and output (Y) variables
+X:= trainset(number < 4);
+Y := PROJECT(trainset(number = 4), TRANSFORM(Types.DiscreteField, SELF.number := 1, SELF := LEFT));
+OUTPUT(X, NAMED('X'));
+OUTPUT(Y, NAMED('Y'));
 
 //Training LogisticRegression Model
-mod_bi := LR.BinomialLogisticRegression(100,0.00001).getModel(DStrainInd, DStrainDpt);
+mod_bi := LR.BinomialLogisticRegression(100,0.00001).getModel(X, Y);
 
 //Prediction
-predict_bi := LR.BinomialLogisticRegression().Classify(mod_bi, DStrainInd);
-OUTPUT(predict_bi);
+predict := LR.BinomialLogisticRegression().Classify(mod_bi, X);
+OUTPUT(predict, NAMED('predict'));
